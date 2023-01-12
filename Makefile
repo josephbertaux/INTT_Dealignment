@@ -9,8 +9,8 @@ CC = cc
 GG = g++
 
 FLAGS = `root-config --cflags`
-# INCS = -I`root-config --incdir` #already included with root-config --cflags
-LIBS = `root-config --evelibs` -lTMVA -lTMVAGui -lRooFitCore -lRooFitMore -lRooFit
+INCS = #-I`root-config --incdir` #already included with root-config --cflags
+LIBS = #`root-config --evelibs` -lTMVA -lTMVAGui -lRooFitCore -lRooFitMore -lRooFit
 
 SRCS = $(shell find $(SRC_DIR) -name *.$(CC))
 OBJS = $(patsubst $(SRC_DIR)/%.$(CC),$(OBJ_DIR)/%.o,$(SRCS))
