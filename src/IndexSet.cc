@@ -1,57 +1,5 @@
 #include "IndexSet.h"
 
-bool operator==(const IndexSet& a, const IndexSet& b)
-{
-	auto a_itr = a.indices.begin();
-	auto b_itr = b.indices.begin();
-
-	for(a_itr = a.indices.begin(); a_itr != a.indices.end(); ++a_itr)
-	{
-		b_itr = b.indices.find(a_itr->first);
-
-		if(b_itr == b.indices.end())return false;
-
-		if(a_itr->second != b_itr->second)return false;
-	}
-
-	for(b_itr = b.indices.begin(); b_itr != b.indices.end(); ++b_itr)
-	{
-		a_itr = a.indices.find(b_itr->first);
-
-		if(a_itr == a.indices.end())return false;
-
-		if(a_itr->second != b_itr->second)return false;
-	}
-
-	return true;
-}
-
-bool operator!=(const IndexSet& a, const IndexSet& b)
-{
-	auto a_itr = a.indices.begin();
-	auto b_itr = b.indices.begin();
-
-	for(a_itr = a.indices.begin(); a_itr != a.indices.end(); ++a_itr)
-	{
-		b_itr = b.indices.find(a_itr->first);
-
-		if(b_itr == b.indices.end())return true;
-
-		if(a_itr->second != b_itr->second)return true;
-	}
-
-	for(b_itr = b.indices.begin(); b_itr != b.indices.end(); ++b_itr)
-	{
-		a_itr = a.indices.find(b_itr->first);
-
-		if(a_itr == a.indices.end())return true;
-
-		if(a_itr->second != b_itr->second)return true;
-	}
-
-	return false;
-}
-
 bool IndexSet::operator==(const IndexSet& b)
 {
 	auto itr = indices.begin();
@@ -78,27 +26,47 @@ bool IndexSet::operator==(const IndexSet& b)
 	return true;
 }
 
-bool IndexSet::operator!=(const IndexSet& b)
+bool IndexSet::operator<(const IndexSet& b)
 {
+	if(indices.size() < b.indices.size())return true;
+	if(indices.size() > b.indices.size())return false;
+
 	auto itr = indices.begin();
 	auto b_itr = b.indices.begin();
 
-	for(itr = indices.begin(); itr != indices.end(); ++itr)
+	while(true)
 	{
-		b_itr = b.indices.find(itr->first);
+		if(itr->second < b_itr->second)return true;
+		if(itr->second > b_itr->second)return false;
 
-		if(b_itr == b.indices.end())return true;
+		++itr;
+		++b_itr;
 
-		if(itr->second != b_itr->second)return true;
+		if(itr == indices.end())break;
+		if(b_itr == indices.end())break;
 	}
 
-	for(b_itr = b.indices.begin(); b_itr != b.indices.end(); ++b_itr)
+	return false;
+}
+
+bool IndexSet::operator>(const IndexSet& b)
+{
+	if(indices.size() < b.indices.size())return false;
+	if(indices.size() > b.indices.size())return true;
+
+	auto itr = indices.begin();
+	auto b_itr = b.indices.begin();
+
+	while(true)
 	{
-		itr = indices.find(b_itr->first);
+		if(itr->second < b_itr->second)return false;
+		if(itr->second > b_itr->second)return true;
 
-		if(itr == indices.end())return true;
+		++itr;
+		++b_itr;
 
-		if(itr->second != b_itr->second)return true;
+		if(itr == indices.end())break;
+		if(b_itr == indices.end())break;
 	}
 
 	return false;
@@ -172,19 +140,19 @@ void IndexSet::AddIndex(GenericIndex i)
 int IndexSet::GetIndex(std::string s, int& i)
 {
 	auto itr = indices.find(s);
-	if(itr == indices.end())return 0;
+	if(itr == indices.end())return 1;
 
 	i = itr->second.index;
 
-	return 1;
+	return 0;
 }
 
 int IndexSet::SetIndex(std::string s, int i)
 {
 	auto itr = indices.find(s);
-	if(itr == indices.end())return 0;
+	if(itr == indices.end())return 1;
 
 	itr->second.index = i;
 
-	return 1;
+	return 0;
 }

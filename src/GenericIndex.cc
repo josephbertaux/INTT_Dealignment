@@ -1,27 +1,5 @@
 #include "GenericIndex.h"
 
-bool operator==(const GenericIndex& a, const GenericIndex& b)
-{
-	if(a.label != b.label)return false;
-
-	if(a.index != b.index)return false;
-	if(a.lower != b.lower)return false;
-	if(a.upper != b.upper)return false;
-
-	return true;
-}
-
-bool operator!=(const GenericIndex& a, const GenericIndex& b)
-{
-	if(a.label != b.label)return true;
-
-	if(a.index != b.index)return true;
-	if(a.lower != b.lower)return true;
-	if(a.upper != b.upper)return true;
-
-	return false;
-}
-
 GenericIndex::GenericIndex(std::string s, int i, int l, int u)
 {
 	label = s;
@@ -40,7 +18,7 @@ GenericIndex::GenericIndex(const GenericIndex& b)
 	upper = b.upper;
 }
 
-bool GenericIndex::operator==(const GenericIndex& b) const
+bool GenericIndex::operator==(const GenericIndex& b)
 {
 	if(label != b.label)return false;
 
@@ -51,15 +29,14 @@ bool GenericIndex::operator==(const GenericIndex& b) const
 	return true;
 }
 
-bool GenericIndex::operator!=(const GenericIndex& b) const
+bool GenericIndex::operator<(const GenericIndex& b)
 {
-	if(label != b.label)return true;
+	return index < b.index;
+}
 
-	if(index != b.index)return true;
-	if(lower != b.lower)return true;
-	if(upper != b.upper)return true;
-
-	return false;
+bool GenericIndex::operator>(const GenericIndex& b)
+{
+	return index > b.index;
 }
 
 GenericIndex& GenericIndex::operator++()

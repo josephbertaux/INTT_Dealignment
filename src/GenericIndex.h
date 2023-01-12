@@ -17,8 +17,13 @@ public:
 	GenericIndex(std::string, int, int, int);
 	GenericIndex(const GenericIndex&);
 
-	bool operator==(const GenericIndex&) const;
-	bool operator!=(const GenericIndex&) const;
+	bool operator==(const GenericIndex&);
+	bool operator!=(const GenericIndex& b){return !operator==(b);}
+	
+	bool operator<(const GenericIndex&);
+	bool operator>(const GenericIndex&);
+	bool operator<=(const GenericIndex& b){return !operator>(b);}
+	bool operator>=(const GenericIndex& b){return !operator<(b);}
 
 	GenericIndex& operator++();
 	GenericIndex& operator--();

@@ -16,7 +16,12 @@ public:
 
 public:
 	bool operator==(const IndexSet&);
-	bool operator!=(const IndexSet&);
+	bool operator!=(const IndexSet& b){return !operator==(b);}
+
+	bool operator<(const IndexSet&);
+	bool operator>(const IndexSet&);
+	bool operator<=(const IndexSet& b){return !operator>(b);}
+	bool operator>=(const IndexSet& b){return !operator<(b);}
 
 	IndexSet& operator++(); 
 	IndexSet& operator--(); 
