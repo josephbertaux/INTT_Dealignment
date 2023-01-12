@@ -25,6 +25,8 @@ public:
 
 	const GenericIndex begin();
 	const GenericIndex end();
+
+	GenericIndex(std::string s, int l, int u) : GenericIndex(s, l, l, u){};
 };
 
 #endif

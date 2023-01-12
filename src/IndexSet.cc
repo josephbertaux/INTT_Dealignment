@@ -68,7 +68,7 @@ bool IndexSet::operator==(const IndexSet& b)
 
 	for(b_itr = b.indices.begin(); b_itr != b.indices.end(); ++b_itr)
 	{
-		itr = indices.find(itr->first);
+		itr = indices.find(b_itr->first);
 
 		if(itr == indices.end())return false;
 
@@ -94,7 +94,7 @@ bool IndexSet::operator!=(const IndexSet& b)
 
 	for(b_itr = b.indices.begin(); b_itr != b.indices.end(); ++b_itr)
 	{
-		itr = indices.find(itr->first);
+		itr = indices.find(b_itr->first);
 
 		if(itr == indices.end())return true;
 
