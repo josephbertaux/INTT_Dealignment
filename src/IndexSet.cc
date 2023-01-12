@@ -168,3 +168,23 @@ void IndexSet::AddIndex(GenericIndex i)
 {
 	indices.insert({i.label, i});
 }
+
+int IndexSet::GetIndex(std::string s, int& i)
+{
+	auto itr = indices.find(s);
+	if(itr == indices.end())return 0;
+
+	i = itr->second.index;
+
+	return 1;
+}
+
+int IndexSet::SetIndex(std::string s, int i)
+{
+	auto itr = indices.find(s);
+	if(itr == indices.end())return 0;
+
+	itr->second.index = i;
+
+	return 1;
+}

@@ -22,7 +22,6 @@ int main()
 			std::cout << itr->first << ":\t" << (itr->second).index << "\t\t";
 		}
 		std::cout << std::endl;
-		++biz;
 	}
 	std::cout << "here" << std::endl;
 

@@ -25,6 +25,9 @@ public:
 	const IndexSet end();
 
 	void AddIndex(GenericIndex);
+
+	int GetIndex(std::string, int&);
+	int SetIndex(std::string, int);
 };
 
 #endif
