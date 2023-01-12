@@ -1,3 +1,6 @@
+# a great resource:
+# https://makefiletutorial.com/
+
 SHELL=/bin/bash
 
 TRGS = main.exe
@@ -16,7 +19,7 @@ SRCS = $(shell find $(SRC_DIR) -name *.$(CC))
 OBJS = $(patsubst $(SRC_DIR)/%.$(CC),$(OBJ_DIR)/%.o,$(SRCS))
 
 $(TRGS) : $(OBJS)
-	$(GG) $(FLAGS) $(INCS) -o $@  $< $(LIBS)
+	$(GG) $(FLAGS) $(INCS) -o $@  $(OBJS) $(LIBS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(CC)
 	mkdir -p $(dir $@)
