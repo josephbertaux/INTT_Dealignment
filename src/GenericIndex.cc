@@ -18,25 +18,20 @@ GenericIndex::GenericIndex(const GenericIndex& b)
 	upper = b.upper;
 }
 
-bool GenericIndex::operator==(const GenericIndex& b)
+bool operator==(GenericIndex const& lhs, GenericIndex const& rhs)
 {
-	if(label != b.label)return false;
+	if(lhs.label != rhs.label)return false;
 
-	if(index != b.index)return false;
-	if(lower != b.lower)return false;
-	if(upper != b.upper)return false;
+	if(lhs.index != rhs.index)return false;
+	if(lhs.lower != rhs.lower)return false;
+	if(lhs.upper != rhs.upper)return false;
 
 	return true;
 }
 
-bool GenericIndex::operator<(const GenericIndex& b)
+bool operator<(GenericIndex const& lhs, GenericIndex const& rhs)
 {
-	return index < b.index;
-}
-
-bool GenericIndex::operator>(const GenericIndex& b)
-{
-	return index > b.index;
+	return lhs.index < rhs.index;
 }
 
 GenericIndex& GenericIndex::operator++()

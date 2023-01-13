@@ -1,72 +1,44 @@
 #include "IndexSet.h"
 
-bool IndexSet::operator==(const IndexSet& b)
+bool operator==(IndexSet const& lhs, IndexSet const& rhs)
 {
-	auto itr = indices.begin();
-	auto b_itr = b.indices.begin();
+	if(lhs.indices.size() != rhs.indices.size())return false;
 
-	for(itr = indices.begin(); itr != indices.end(); ++itr)
+	auto lhs_itr = lhs.indices.begin();
+	auto rhs_itr = rhs.indices.begin();
+
+	while(true)
 	{
-		b_itr = b.indices.find(itr->first);
+		if(lhs_itr->second != rhs_itr->second)return false;
 
-		if(b_itr == b.indices.end())return false;
+		++lhs_itr;
+		++rhs_itr;
 
-		if(itr->second != b_itr->second)return false;
-	}
-
-	for(b_itr = b.indices.begin(); b_itr != b.indices.end(); ++b_itr)
-	{
-		itr = indices.find(b_itr->first);
-
-		if(itr == indices.end())return false;
-
-		if(itr->second != b_itr->second)return false;
+		if(lhs_itr == lhs.indices.end())break;
+		if(rhs_itr == rhs.indices.end())break;
 	}
 
 	return true;
 }
 
-bool IndexSet::operator<(const IndexSet& b)
+bool operator<(IndexSet const& lhs, IndexSet const& rhs)
 {
-	if(indices.size() < b.indices.size())return true;
-	if(indices.size() > b.indices.size())return false;
+	if(lhs.indices.size() < rhs.indices.size())return true;
+	if(lhs.indices.size() > rhs.indices.size())return false;
 
-	auto itr = indices.begin();
-	auto b_itr = b.indices.begin();
+	auto lhs_itr = lhs.indices.begin();
+	auto rhs_itr = rhs.indices.begin();
 
 	while(true)
 	{
-		if(itr->second < b_itr->second)return true;
-		if(itr->second > b_itr->second)return false;
+		if(lhs_itr->second < rhs_itr->second)return true;
+		if(lhs_itr->second > rhs_itr->second)return false;
 
-		++itr;
-		++b_itr;
+		++lhs_itr;
+		++rhs_itr;
 
-		if(itr == indices.end())break;
-		if(b_itr == indices.end())break;
-	}
-
-	return false;
-}
-
-bool IndexSet::operator>(const IndexSet& b)
-{
-	if(indices.size() < b.indices.size())return false;
-	if(indices.size() > b.indices.size())return true;
-
-	auto itr = indices.begin();
-	auto b_itr = b.indices.begin();
-
-	while(true)
-	{
-		if(itr->second < b_itr->second)return false;
-		if(itr->second > b_itr->second)return true;
-
-		++itr;
-		++b_itr;
-
-		if(itr == indices.end())break;
-		if(b_itr == indices.end())break;
+		if(lhs_itr == lhs.indices.end())break;
+		if(rhs_itr == rhs.indices.end())break;
 	}
 
 	return false;

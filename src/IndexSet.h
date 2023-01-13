@@ -15,13 +15,13 @@ public:
 	std::map<std::string, GenericIndex> indices;
 
 public:
-	bool operator==(const IndexSet&);
-	bool operator!=(const IndexSet& b){return !operator==(b);}
+	friend bool operator==(IndexSet const&, IndexSet const&);
+	friend bool operator!=(IndexSet const& lhs, IndexSet const& rhs){return !(lhs == rhs);}
 
-	bool operator<(const IndexSet&);
-	bool operator>(const IndexSet&);
-	bool operator<=(const IndexSet& b){return !operator>(b);}
-	bool operator>=(const IndexSet& b){return !operator<(b);}
+	friend bool operator<(IndexSet const&, IndexSet const&);
+	friend bool operator>(IndexSet const& lhs, IndexSet const& rhs){return rhs < lhs;}
+	friend bool operator<=(IndexSet const& lhs, IndexSet const& rhs){return !(lhs > rhs);}
+	friend bool operator>=(IndexSet const& lhs, IndexSet const& rhs){return !(lhs < rhs);}
 
 	IndexSet& operator++(); 
 	IndexSet& operator--(); 

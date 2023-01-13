@@ -16,6 +16,12 @@ protected:
 
 public:
 	IndexSetWrapper(IndexSet);
+
+	IndexSetWrapper& operator++();
+	IndexSetWrapper& operator--();
+
+	int Get(T& t);
+	int Set(T t);
 };
 
 #endif
