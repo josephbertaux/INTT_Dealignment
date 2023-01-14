@@ -1,5 +1,21 @@
 #include "IndexSet.h"
 
+IndexSet::IndexSet()
+{
+	//Do nothing
+}
+
+IndexSet::IndexSet(IndexSet const& b)
+{
+	indices.clear();
+
+	auto itr = b.indices.begin();
+	for(itr = b.indices.begin(); itr != b.indices.end(); ++itr)
+	{
+		indices.insert({itr->first, itr->second});
+	}
+}
+
 bool operator==(IndexSet const& lhs, IndexSet const& rhs)
 {
 	if(lhs.indices.size() != rhs.indices.size())return false;
@@ -125,6 +141,8 @@ int IndexSet::SetIndex(std::string s, int i)
 	if(itr == indices.end())return 1;
 
 	itr->second.index = i;
+
+	if(!(itr->second.lower <= itr->second.index && itr->second.index < itr->second.upper))itr->second.index = itr->second.upper;
 
 	return 0;
 }

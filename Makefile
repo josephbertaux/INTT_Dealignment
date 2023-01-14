@@ -19,6 +19,7 @@ SRCS = $(shell find $(SRC_DIR) -name *.$(CC))
 OBJS = $(patsubst $(SRC_DIR)/%.$(CC),$(OBJ_DIR)/%.o,$(SRCS))
 
 $(TRGS) : $(OBJS)
+	mkdir -p $(dir $@)
 	$(GG) $(FLAGS) $(INCS) -o $@  $(OBJS) $(LIBS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(CC)

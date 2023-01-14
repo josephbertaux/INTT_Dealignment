@@ -15,6 +15,9 @@ public:
 	std::map<std::string, GenericIndex> indices;
 
 public:
+	IndexSet();
+	IndexSet(IndexSet const&);
+
 	friend bool operator==(IndexSet const&, IndexSet const&);
 	friend bool operator!=(IndexSet const& lhs, IndexSet const& rhs){return !(lhs == rhs);}
 
