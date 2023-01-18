@@ -66,7 +66,7 @@ AlignTransform AlignTransform::Inverse()
 	{
 		//find a pivot
 		d = 0.0;
-		for(i = 0; i < 4; ++i)
+		for(i = j; i < 4; ++i)
 		{
 			if(std::abs(lhs[i][j]) > d)
 			{
@@ -76,18 +76,18 @@ AlignTransform AlignTransform::Inverse()
 		}
 
 		//Check for singularity
-		if(d == 0.0)
+		if(d == 0.0)std::cout << "singular" << std::endl;
 
 		//Pivot was found on row k; exchanges rows j and k to move it to diagonal
 		for(i = 0; i < 4; ++i)
 		{
 			d = lhs[j][i];
-			lhs[j][i] = lhs[j][k];
-			lhs[j][k] = d;
+			lhs[j][i] = lhs[k][i];
+			lhs[k][i] = d;
 
 			d = rhs[j][i];
-			rhs[j][i] = rhs[j][k];
-			rhs[j][k] = d;
+			rhs[j][i] = rhs[k][i];
+			rhs[k][i] = d;
 		}
 
 		//Normalize the pivot row

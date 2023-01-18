@@ -8,8 +8,9 @@
 #include "TTree.h"
 #include "TVector3.h"
 
-#include <string>
+#include <cstdio>
 #include <map>
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -32,14 +33,22 @@ protected:
 
 	std::map<std::string, std::tuple<TVector3, TVector3, bool>> marks;
 
+	int SetMarks(const int&);
+	int GetTransformFromMarks(AlignTransform&, const std::vector<TVector3>&);
+	int GetTransform(AlignTransform&, const std::vector<TVector3>&, const std::vector<TVector3>&);
+
 public:
 	std::string text_output_filename = "sensor_survey_data.root";
 	std::string root_output_filename = "sensor_survey_read.out";
 
-	//int ReadSurveyFile(const std::string&, std::stringstream&);
-	//int ComputeRelativeTransform(const std::string&, TransformAlign);
-
 	InttSensorSurveyReader();
+
+	int ReadSurveyFile(const std::string&);
+	int GetNominalSensorTransform(const int&, AlignTransform&);
+	int GetActualSensorTransform(const int&, AlignTransform&);
+
+	void PrintMarks();
+
 };
 
 #endif
