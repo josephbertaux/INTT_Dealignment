@@ -8,18 +8,33 @@
 
 int main()
 {
-	InttSensorSurveyReader sensor_reader;
+	std::string sensor_survey_dir = "/sphenix/u/jbertaux/Data/Repositories/INTT_Dealignment/dat/sensor_survey_data/";
 
-	if(sensor_reader.ReadSurveyFile("/sphenix/u/jbertaux/Data/Repositories/INTT_Dealignment/dat/sensor_survey_data/B1L104.txt"))return 1;
-
+	int layer = 3;
+	int ladder = 4;
+	int sensor = 0;
+	char buff[16] = {"\0"};
+	std::string s = "";
 
 	AlignTransform t;
+	InttSensorSurveyReader sensor_reader;
 
-	for(int i = 0; i < 4; ++i)
+	for(layer = 0; layer < INTT::LAYER; ++layer)
 	{
-		sensor_reader.GetNominalSensorTransform(i, t);
-		t.Print();
-		std::cout << std::endl;
+		for(ladder = 0; ladder < INTT::LADDER[layer]; ++ladder)
+		{
+			sprintf(buff, "B%iL%03i.txt", layer / 2, (layer % 2) * 100 + ladder);
+			s = sensor_survey_dir + buff;
+			if(sensor_reader.ReadSurveyFile(s))continue;
+
+			std::cout << buff << std::endl;
+			for(sensor = 0; sensor < INTT::SENSOR; ++sensor)
+			{
+				sensor_reader.GetActualSensorTransform(sensor, t);
+				t.Print();
+				std::cout << std::endl;
+			}
+		}
 	}
 
 	return 0;
