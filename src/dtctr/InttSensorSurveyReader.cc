@@ -75,6 +75,11 @@ int InttSensorSurveyReader::ReadSurveyFile(const std::string& filename)
 		goto label;
 	}
 
+	for(itr = marks.begin(); itr != marks.end(); ++itr)
+	{
+		std::get<2>(itr->second) = false;
+	}
+
 	for(line; std::getline(survey_file, line);)
 	{
 		for(itr = marks.begin(); itr != marks.end(); ++itr)

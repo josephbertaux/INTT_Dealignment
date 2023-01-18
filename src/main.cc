@@ -30,9 +30,9 @@ int main()
 			std::cout << buff << std::endl;
 			for(sensor = 0; sensor < INTT::SENSOR; ++sensor)
 			{
-				sensor_reader.GetActualSensorTransform(sensor, t);
-				t.Print();
-				std::cout << std::endl;
+				if(sensor_reader.GetActualSensorTransform(sensor, t))continue;
+				//t.Print();
+				//std::cout << std::endl;
 			}
 		}
 	}
