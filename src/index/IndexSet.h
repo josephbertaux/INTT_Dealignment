@@ -33,6 +33,7 @@ public:
 	const IndexSet end();
 
 	void AddIndex(GenericIndex);
+	void AddIndex(std::string s, int l, int u){AddIndex(GenericIndex(s, l, u));}
 
 	int GetIndex(std::string, int&);
 	int SetIndex(std::string, int);
