@@ -218,6 +218,8 @@ int InttSensorSurveyReader::GetTransformFromMarks(AlignTransform& t, const std::
 	out << "InttSensorSurveyReader::GetTransformFromMarks(AlignTransform& t, const std::vector<TVector3>& transform_marks)" << std::endl;
 	//local to world
 
+	t.Reset();
+
 	int i = 0;
 	int j = 0;
 	TVector3 axes[3];
@@ -254,6 +256,8 @@ int InttSensorSurveyReader::GetTransform(AlignTransform& t, const std::vector<TV
 	out << "InttSensorSurveyReader::GetTransform(AlignTransform& t, const std::vector<TVector3>& child_marks, const std::vector<TVector3>& parent_marks)" << std::endl;
 	//child to parent
 
+	t.Reset();
+
 	AlignTransform parent;	//parent to world
 	AlignTransform child;	//child to world
 
@@ -278,12 +282,46 @@ int InttSensorSurveyReader::GetTransform(AlignTransform& t, const std::vector<TV
 	return return_val;
 }
 
-int InttSensorSurveyReader::GetNominalSensorTransform(const int& i, AlignTransform& t)
+int InttSensorSurveyReader::GetNominalPixelToSensor(const int& i, const int& j, const int& k, AlignTransform& t)
+{
+	int return_val = 0;
+	std::stringstream out;
+	out << "InttSensorSurveyReader::GetNominalPixelToSensor(const int& i, const int& j, const int& k, AlignTransform& t)" << std::endl;
+	//nominal pixel to sensor
+
+	t.Reset();
+
+	if(!(0 <= j && j < INTT::STRIP_X))
+	{
+		out << "\tPassed argument j (" << j << ") not a vaild strip_x index [0, " << INTT::STRIP_X << ")" << std::endl;
+		return_val = 1;
+		goto label;
+	}
+	if(!(0 <= k && k < INTT::STRIP_Z[i]))
+	{
+		out << "\tPassed argument k (" << k << ") not a vaild strip_z index [0, " << INTT::STRIP_Z[i] << ")" << std::endl;
+		return_val = 1;
+		goto label;
+	}
+
+	//pixel to sensor (nominal)
+	t.Pos(0) = INTT::STRIP_XM * j + INTT::STRIP_XB;
+	t.Pos(2) = INTT::STRIP_ZM[i] * k + INTT::STRIP_ZB[i];
+
+	label:
+	out << std::ends;
+	if(return_val)std::cout << out.str() << std::endl;
+	return return_val;
+}
+
+int InttSensorSurveyReader::GetNominalSensorToLadder(const int& i, AlignTransform& t)
 {
 	int return_val = 0;
 	std::stringstream out;
 	out << "InttSensorSurveyReader::GetNominalSensorTransform(const int& i, AlignTransform& t)" << std::endl;
 	//nominal sensor to ladder
+
+	t.Reset();
 
 	if(SetMarks(i))
 	{
@@ -303,12 +341,14 @@ int InttSensorSurveyReader::GetNominalSensorTransform(const int& i, AlignTransfo
 	return return_val;
 }
 
-int InttSensorSurveyReader::GetActualSensorTransform(const int& i, AlignTransform& t)
+int InttSensorSurveyReader::GetActualSensorToLadder(const int& i, AlignTransform& t)
 {
 	int return_val = 0;
 	std::stringstream out;
 	out << "InttSensorSurveyReader::GetActualSensorTransform(const int& i, AlignTransform& t)" << std::endl;
 	//actual sensor to ladder
+
+	t.Reset();
 
 	if(SetMarks(i))
 	{
@@ -328,6 +368,72 @@ int InttSensorSurveyReader::GetActualSensorTransform(const int& i, AlignTransfor
 	return return_val;
 }
 
+
+int InttSensorSurveyReader::GetNominalPixelToLadder(const int& i, const int& j, const int& k, AlignTransform& t)
+{
+	int return_val = 0;
+	std::stringstream out;
+	out << "InttSensorSurveyReader::GetNominalPixelToLadder(const int& i, const int& j, const int& k, AlignTransform& t)" << std::endl;
+	//nominal pixel to ladder
+
+	t.Reset();
+
+	//sensor to ladder
+	AlignTransform u;
+
+	if(GetNominalPixelToSensor(i, j, k, t))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	if(GetNominalSensorToLadder(i, u))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	//(ladder <- sensor) * (sensor <- pixel)
+	t = u * t;
+
+	label:
+	out << std::ends;
+	if(return_val)std::cout << out.str() << std::endl;
+	return return_val;
+}
+
+int InttSensorSurveyReader::GetActualPixelToLadder(const int& i, const int& j, const int& k, AlignTransform& t)
+{
+	int return_val = 0;
+	std::stringstream out;
+	out << "InttSensorSurveyReader::GetActualPixelToLadder(const int& i, const int& j, const int& k, AlignTransform& t)" << std::endl;
+	//nominal pixel to ladder
+
+	t.Reset();
+
+	//sensor to ladder
+	AlignTransform u;
+
+	if(GetNominalPixelToSensor(i, j, k, t))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	if(GetActualSensorToLadder(i, u))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	//(ladder <- sensor) * (sensor <- pixel)
+	t = u * t;
+
+	label:
+	out << std::ends;
+	if(return_val)std::cout << out.str() << std::endl;
+	return return_val;
+}
 
 void InttSensorSurveyReader::PrintMarks()
 {

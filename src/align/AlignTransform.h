@@ -32,7 +32,9 @@ public:
 	int SetTransformFromAngles();
 	int SetAnglesFromTransform();
 
-	void PrintRow(int, std::string= "%+10.4f");
+	void Reset();
+
+	void PrintRow(const int&, std::string= "%+10.4f");
 	void Print(std::string = "%+10.4f");
 
 	template <typename T>

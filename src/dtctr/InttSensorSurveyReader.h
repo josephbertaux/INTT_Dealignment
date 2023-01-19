@@ -44,8 +44,14 @@ public:
 	InttSensorSurveyReader();
 
 	int ReadSurveyFile(const std::string&);
-	int GetNominalSensorTransform(const int&, AlignTransform&);
-	int GetActualSensorTransform(const int&, AlignTransform&);
+
+	int GetNominalPixelToSensor(const int&, const int&, const int &, AlignTransform&);
+
+	int GetNominalSensorToLadder(const int&, AlignTransform&);
+	int GetActualSensorToLadder(const int&, AlignTransform&);
+
+	int GetNominalPixelToLadder(const int&, const int&, const int&, AlignTransform&);
+	int GetActualPixelToLadder(const int&, const int&, const int&, AlignTransform&);
 
 	void PrintMarks();
 

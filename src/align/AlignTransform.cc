@@ -136,7 +136,32 @@ int AlignTransform::SetAnglesFromTransform()
 	return angle_convention->SetAnglesFromTransform(align_transform, angles);
 }
 
-void AlignTransform::PrintRow(int i, std::string s)
+void AlignTransform::Reset()
+{
+	int i = 0;
+	int j = 0;
+
+	for(i = 0; i < 4; ++i)
+	{
+		for(j = 0; j < i; ++j)
+		{
+			align_transform[i][j] = 0.0;
+		}
+		align_transform[i][i] = 1.0;
+		for(j = i + 1; j < 4; ++j)
+		{
+			align_transform[i][j] = 0.0;
+		}
+	}
+
+	for(i = 0; i < 3; ++i)
+	{
+		angles[i] = 0.0;
+	}
+
+}
+
+void AlignTransform::PrintRow(const int& i, std::string s)
 {
 	int j = 0;
 	while(true)
