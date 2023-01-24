@@ -33,7 +33,6 @@ protected:
 
 	std::map<std::string, std::tuple<TVector3, TVector3, bool>> marks;
 
-	int SetMarks(const int&);
 	int GetTransformFromMarks(AlignTransform&, const std::vector<TVector3>&);
 	int GetTransform(AlignTransform&, const std::vector<TVector3>&, const std::vector<TVector3>&);
 
@@ -44,6 +43,7 @@ public:
 	InttSensorSurveyReader();
 
 	int ReadSurveyFile(const std::string&);
+	int SetMarks(const int&);
 
 	int GetNominalPixelToSensor(const int&, const int&, const int &, AlignTransform&);
 

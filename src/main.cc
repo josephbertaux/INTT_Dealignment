@@ -6,12 +6,24 @@
 #include <vector>
 #include <iostream>
 
+#include "TH1D.h"
+#include "TTree.h"
+#include "TFile.h"
+
 int main()
 {
 	std::string sensor_survey_dir = "/sphenix/u/jbertaux/Data/Repositories/INTT_Dealignment/dat/sensor_survey_data/";
+	std::string sensor_survey_file = "/sphenix/u/jbertaux/Data/Repositories/INTT_Dealignment/dat/sensor_survey.root";
 
-	int layer = 3;
-	int ladder = 4;
+	std::string tree_name = "sensor_survey_tree";
+	std::string hist_name = "sensor_survey_hist";
+
+	int num_bins = 20;
+	double bin_min = 0.0;
+	double bin_max = 0.4;
+
+	int layer = 0;
+	int ladder = 0;
 	int sensor = 0;
 	int strip_z = 0;
 	int strip_x = 0;
@@ -27,6 +39,43 @@ int main()
 
 	InttSensorSurveyReader sensor_reader;
 
+	TFile* file = nullptr;
+	TTree* tree = nullptr;
+	TH1D* hist = nullptr;
+
+	if(sensor_survey_file.empty())
+	{
+		std::cout << "Member \"sensor_survey_file\" is empty string" << std::endl;
+
+		return 1;
+	}
+	file = TFile::Open(sensor_survey_file.c_str(), "RECREATE");
+	if(!file)
+	{
+		std::cout << "Couldn't get file:" << std::endl;
+		std::cout << "\t" << sensor_survey_file << std::endl;
+
+		return 1;
+	}
+	file->cd();
+
+	if(tree_name.empty())
+	{
+		std::cout << "Member \"tree_name\" is empty string" << std::endl;
+
+		return 1;
+	}
+	//tree = new TTree(tree_name.c_str(), tree_name.c_str());
+
+	if(hist_name.empty())
+	{
+		std::cout << "Member \"tree_name\" is empty string" << std::endl;
+
+		return 1;
+	}
+	hist = new TH1D(hist_name.c_str(), "Distribution of Worst-Case Pixel Displacements over INTT Sensors", num_bins, bin_min, bin_max);
+	hist->GetXaxis()->SetTitle("Maximum pixel distance from nominal (cm)");
+
 	for(layer = 0; layer < INTT::LAYER; ++layer)
 	{
 		for(ladder = 0; ladder < INTT::LADDER[layer]; ++ladder)
@@ -39,6 +88,8 @@ int main()
 
 			for(sensor = 0; sensor < INTT::SENSOR; ++sensor)
 			{
+				if(sensor_reader.SetMarks(sensor))continue;
+
 				d = 0.0;
 				for(strip_x = 0; strip_x < INTT::STRIP_X; ++strip_x)
 				{
@@ -60,10 +111,26 @@ int main()
 					}
 				}
 				std::cout << "\t" << sensor << ":\t" << d << "\t (cm)" << std::endl;
+				hist->Fill(d);
 			}
 			std::cout << std::endl;
 		}
 	}
+
+
+	if(tree)
+	{
+		tree->Write();
+		delete tree;
+	}
+	if(hist)
+	{
+		hist->Write();
+		delete hist;
+	}
+
+	if(file)file->Write();
+	if(file)file->Close();
 
 	return 0;
 }
