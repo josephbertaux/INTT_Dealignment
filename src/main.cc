@@ -18,7 +18,7 @@ int main()
 	std::string tree_name = "sensor_survey_tree";
 	std::string hist_name = "sensor_survey_hist";
 
-	int num_bins = 20;
+	int num_bins = 120;
 	double bin_min = 0.0;
 	double bin_max = 0.4;
 
@@ -73,8 +73,9 @@ int main()
 
 		return 1;
 	}
-	hist = new TH1D(hist_name.c_str(), "Distribution of Worst-Case Pixel Displacements over INTT Sensors", num_bins, bin_min, bin_max);
-	hist->GetXaxis()->SetTitle("Maximum pixel distance from nominal (cm)");
+	hist = new TH1D(hist_name.c_str(), "Distribution of Pixel Displacements over INTT Sensors", num_bins, bin_min, bin_max);
+	//hist->GetXaxis()->SetTitle("Maximum pixel distance from nominal (cm)");
+	hist->GetXaxis()->SetTitle("Pixel distance from nominal (cm)");
 
 	for(layer = 0; layer < INTT::LAYER; ++layer)
 	{
@@ -107,11 +108,12 @@ int main()
 						b[2] = u.Pos(2);
 
 						a = a - b;
+						hist->Fill(a.Mag());
 						if(a.Mag() > d)d = a.Mag();
 					}
 				}
 				std::cout << "\t" << sensor << ":\t" << d << "\t (cm)" << std::endl;
-				hist->Fill(d);
+				//hist->Fill(d);
 			}
 			std::cout << std::endl;
 		}
