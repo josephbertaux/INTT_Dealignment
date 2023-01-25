@@ -15,19 +15,23 @@ int main()
 	std::string sensor_survey_dir = "/sphenix/u/jbertaux/Data/Repositories/INTT_Dealignment/dat/sensor_survey_data/";
 	std::string sensor_survey_file = "/sphenix/u/jbertaux/Data/Repositories/INTT_Dealignment/dat/sensor_survey.root";
 
-	std::string tree_name = "sensor_survey_tree";
-	std::string hist_name = "sensor_survey_hist";
+	std::string sensor_hist_name = "sensor_hist";
+	std::string pixel_hist_name = "pixel_hist";
 
-	int num_bins = 120;
+	int sensor_bins = 20;
+	int pixel_bins = 120;
 	double bin_min = 0.0;
-	double bin_max = 0.4;
+	double bin_max = 0.6;
 
 	int layer = 0;
 	int ladder = 0;
 	int sensor = 0;
 	int strip_z = 0;
 	int strip_x = 0;
+
+	double c = 0.0;
 	double d = 0.0;
+
 	char buff[16] = {"\0"};
 	std::string s = "";
 
@@ -40,15 +44,9 @@ int main()
 	InttSensorSurveyReader sensor_reader;
 
 	TFile* file = nullptr;
-	TTree* tree = nullptr;
-	TH1D* hist = nullptr;
+	TH1D* sensor_hist = nullptr;
+	TH1D* pixel_hist = nullptr;
 
-	if(sensor_survey_file.empty())
-	{
-		std::cout << "Member \"sensor_survey_file\" is empty string" << std::endl;
-
-		return 1;
-	}
 	file = TFile::Open(sensor_survey_file.c_str(), "RECREATE");
 	if(!file)
 	{
@@ -59,23 +57,10 @@ int main()
 	}
 	file->cd();
 
-	if(tree_name.empty())
-	{
-		std::cout << "Member \"tree_name\" is empty string" << std::endl;
-
-		return 1;
-	}
-	//tree = new TTree(tree_name.c_str(), tree_name.c_str());
-
-	if(hist_name.empty())
-	{
-		std::cout << "Member \"tree_name\" is empty string" << std::endl;
-
-		return 1;
-	}
-	hist = new TH1D(hist_name.c_str(), "Distribution of Pixel Displacements over INTT Sensors", num_bins, bin_min, bin_max);
-	//hist->GetXaxis()->SetTitle("Maximum pixel distance from nominal (cm)");
-	hist->GetXaxis()->SetTitle("Pixel distance from nominal (cm)");
+	sensor_hist = new TH1D(sensor_hist_name.c_str(), "Distribution of Worst-Case Pixel Displacements over INTT Sensors", sensor_bins, bin_min, bin_max);
+	pixel_hist = new TH1D(pixel_hist_name.c_str(), "Distribution of Pixel Displacements over INTT Sensors", pixel_bins, bin_min, bin_max);
+	sensor_hist->GetXaxis()->SetTitle("Pixel distance from nominal (cm)");
+	pixel_hist->GetXaxis()->SetTitle("Pixel distance from nominal (cm)");
 
 	for(layer = 0; layer < INTT::LAYER; ++layer)
 	{
@@ -108,27 +93,30 @@ int main()
 						b[2] = u.Pos(2);
 
 						a = a - b;
-						hist->Fill(a.Mag());
-						if(a.Mag() > d)d = a.Mag();
+						c = a.Mag();
+
+						pixel_hist->Fill(c);
+						if(c > d)d = c;
 					}
 				}
 				std::cout << "\t" << sensor << ":\t" << d << "\t (cm)" << std::endl;
-				//hist->Fill(d);
+				sensor_hist->Fill(d);
+				sensor_reader.GetWorstCross(d);
+				std::cout << "\tworst cross:\t" << d << "\t (cm)" << std::endl;
 			}
 			std::cout << std::endl;
 		}
 	}
 
-
-	if(tree)
+	if(sensor_hist)
 	{
-		tree->Write();
-		delete tree;
+		sensor_hist->Write();
+		delete sensor_hist;
 	}
-	if(hist)
+	if(pixel_hist)
 	{
-		hist->Write();
-		delete hist;
+		pixel_hist->Write();
+		delete pixel_hist;
 	}
 
 	if(file)file->Write();

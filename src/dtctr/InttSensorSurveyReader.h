@@ -44,6 +44,7 @@ public:
 
 	int ReadSurveyFile(const std::string&);
 	int SetMarks(const int&);
+	int GetWorstCross(double&);
 
 	int GetNominalPixelToSensor(const int&, const int&, const int &, AlignTransform&);
 

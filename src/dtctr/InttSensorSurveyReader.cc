@@ -211,6 +211,29 @@ int InttSensorSurveyReader::SetMarks(const int& i)
 	return return_val;
 }
 
+
+int InttSensorSurveyReader::GetWorstCross(double& d)
+{
+	int return_val = 0;
+	std::stringstream out;
+	out << "InttSensorSurveyReader::GetWorstCross(double& d)" << std::endl;
+
+	TVector3 v;
+	std::map<std::string, std::pair<TVector3*, TVector3*>>::const_iterator crosses_itr = crosses.begin();
+
+	d = 0.0;
+	for(crosses_itr = crosses.begin(); crosses_itr != crosses.end(); ++crosses_itr)
+	{
+		v = *((crosses_itr->second).first) - *((crosses_itr->second).second);
+		if(v.Mag() > d)d = v.Mag();
+	}
+
+	label:
+	out << std::ends;
+	if(return_val)std::cout << out.str() << std::endl;
+	return return_val;
+}
+
 int InttSensorSurveyReader::GetTransformFromMarks(AlignTransform& t, const std::vector<TVector3>& transform_marks)
 {
 	int return_val = 0;
