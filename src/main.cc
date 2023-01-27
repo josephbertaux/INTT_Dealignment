@@ -57,10 +57,10 @@ int main()
 	}
 	file->cd();
 
-	sensor_hist = new TH1D(sensor_hist_name.c_str(), "Distribution of Worst-Case Pixel Displacements over INTT Sensors", sensor_bins, bin_min, bin_max);
-	pixel_hist = new TH1D(pixel_hist_name.c_str(), "Distribution of Pixel Displacements over INTT Sensors", pixel_bins, bin_min, bin_max);
-	sensor_hist->GetXaxis()->SetTitle("Pixel distance from nominal (cm)");
-	pixel_hist->GetXaxis()->SetTitle("Pixel distance from nominal (cm)");
+	sensor_hist = new TH1D(sensor_hist_name.c_str(), "Distribution of Worst-Case Nominal-Actual Distances over INTT Sensors", sensor_bins, bin_min, bin_max);
+	pixel_hist = new TH1D(pixel_hist_name.c_str(), "Distribution of Strip Nominal-Actual Distances over INTT Sensors", pixel_bins, bin_min, bin_max);
+	sensor_hist->GetXaxis()->SetTitle("Strip distance from nominal (cm)");
+	pixel_hist->GetXaxis()->SetTitle("Strip distance from nominal (cm)");
 
 	for(layer = 0; layer < INTT::LAYER; ++layer)
 	{
@@ -85,11 +85,11 @@ int main()
 						if(sensor_reader.GetActualPixelToLadder(sensor, strip_x, strip_z, u))continue;
 
 						a[0] = t.Pos(0);
-						a[1] = t.Pos(1);
+						a[1] = 0.0;//t.Pos(1);
 						a[2] = t.Pos(2);
 
 						b[0] = u.Pos(0);
-						b[1] = u.Pos(1);
+						b[1] = 0.0;//u.Pos(1);
 						b[2] = u.Pos(2);
 
 						a = a - b;
@@ -99,7 +99,7 @@ int main()
 						if(c > d)d = c;
 					}
 				}
-				std::cout << "\t" << sensor << ":\t" << d << "\t (cm)" << std::endl;
+				std::cout << "\t\t" << sensor << ":\t" << d << "\t (cm)" << std::endl;
 				sensor_hist->Fill(d);
 				sensor_reader.GetWorstCross(d);
 				std::cout << "\tworst cross:\t" << d << "\t (cm)" << std::endl;
