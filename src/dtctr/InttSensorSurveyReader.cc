@@ -211,6 +211,93 @@ int InttSensorSurveyReader::SetMarks(const int& i)
 	return return_val;
 }
 
+int InttSensorSurveyReader::GetMark(const int& i, const int& j, TVector3& u, TVector3& v)
+{
+	int return_val = 0;
+	std::stringstream out;
+	out << "InttSensorSurveyReader::GetMark(const int& i, const int& j, TVector3& u, TVector3& v)" << std::endl;
+
+	std::string s;
+	AlignTransform nominal_ladder_to_world;
+	AlignTransform mark_transform;
+	AlignTransform nominal_in_ladder;
+	AlignTransform actual_in_ladder;
+
+	std::map<std::string, std::tuple<TVector3, TVector3, bool>>::const_iterator mark = marks.begin();
+
+	if(!(0 <= i and i < crosses.size()))
+	{
+		out << "\tArgument \"i\" out of range" << std::endl;
+		return_val = 1;
+		goto label;
+	}
+
+	if(SetMarks(i))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	if(GetTransformFromMarks(nominal_ladder_to_world, nominal_endcaps))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	s = sensors[i] + " - " + std::next(crosses.begin(), j)->first;
+	mark = marks.find(s);
+
+	if(mark == marks.end())
+	{
+		out << "\tFailed to find mark \"" << s << "\", typo in source code?" << std::endl;
+		return_val = 1;
+		goto label;
+	}
+	if(!std::get<2>(mark->second))
+	{
+			out << "\tMark \"" << s << "\" was not set" << std::endl;
+			out << "\tWas this preceded by a successful call to ReadSurveyFile in the main program?" << std::endl;
+			return_val = 1;
+			goto label;
+	}
+
+	mark_transform.Pos(0) = (std::get<0>(mark->second))[0];
+	mark_transform.Pos(1) = (std::get<0>(mark->second))[1];
+	mark_transform.Pos(2) = (std::get<0>(mark->second))[2];
+
+	nominal_ladder_to_world = nominal_ladder_to_world.Inverse();
+	mark_transform = nominal_ladder_to_world * mark_transform;
+	//mark transform is now its nominal tranform in the ladder frame
+
+	//using nominal position in ladder frame, find where this mark is and should be in sensor frame
+	if(GetNominalSensorToLadder(i, nominal_in_ladder))
+	{
+		return_val = 1;
+		goto label;
+	}
+	if(GetActualSensorToLadder(i, actual_in_ladder))
+	{
+		return_val = 1;
+		goto label;
+	}
+
+	nominal_in_ladder = nominal_in_ladder.Inverse();
+	nominal_in_ladder = nominal_in_ladder * mark_transform;
+	u[0] = nominal_in_ladder.Pos(0);
+	u[1] = nominal_in_ladder.Pos(1);
+	u[2] = nominal_in_ladder.Pos(2);
+
+	actual_in_ladder = actual_in_ladder.Inverse();
+	actual_in_ladder = actual_in_ladder * mark_transform;
+	v[0] = actual_in_ladder.Pos(0);
+	v[1] = actual_in_ladder.Pos(1);
+	v[2] = actual_in_ladder.Pos(2);
+
+	label:
+	out << std::ends;
+	if(return_val)std::cout << out.str() << std::endl;
+	return return_val;
+}
 
 int InttSensorSurveyReader::GetWorstCross(double& d)
 {

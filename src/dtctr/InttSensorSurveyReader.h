@@ -20,6 +20,7 @@
 class InttSensorSurveyReader
 {
 protected:
+	std::string current_sensor = "";
 	std::vector<std::string> sensors = {"Sensor A", "Sensor B", "Sensor C", "Sensor D"};
 
 	std::vector<TVector3> nominal_crosses;
@@ -44,6 +45,7 @@ public:
 
 	int ReadSurveyFile(const std::string&);
 	int SetMarks(const int&);
+	int GetMark(const int&, const int&, TVector3&, TVector3&);
 	int GetWorstCross(double&);
 
 	int GetNominalPixelToSensor(const int&, const int&, const int &, AlignTransform&);
@@ -55,7 +57,6 @@ public:
 	int GetActualPixelToLadder(const int&, const int&, const int&, AlignTransform&);
 
 	void PrintMarks();
-
 };
 
 #endif
