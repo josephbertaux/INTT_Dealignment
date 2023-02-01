@@ -4,7 +4,7 @@ std::string tree_name = "mark_tree";
 TTree* mark_tree = nullptr;
 Long64_t n = 0;
 
-double scale = 10.0;
+double scale = 30.0;
 double radius = 0.1; //cm
 
 int layer = 0;
