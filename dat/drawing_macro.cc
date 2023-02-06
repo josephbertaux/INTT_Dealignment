@@ -4,8 +4,8 @@ std::string tree_name = "mark_tree";
 TTree* mark_tree = nullptr;
 Long64_t n = 0;
 
-double scale = 30.0;
-double radius = 0.1; //cm
+double scale = 100.0;
+double arrow_size = 0.05;
 
 int layer = 0;
 int ladder = 0;
@@ -56,7 +56,7 @@ void drawing_macro()
 	mark_tree->SetBranchAddress("cross_dis3", &(cross_dis_ptr[3]));
 }
 
-void Draw(int const& _sensor, int const& _layer = -1, int const& _ladder = -1)
+void Draw(int const& _layer = -1, int const& _ladder = -1, int const& _sensor = -2) 
 {
 	int i;
 
@@ -75,14 +75,13 @@ void Draw(int const& _sensor, int const& _layer = -1, int const& _ladder = -1)
 	{
 		mark_tree->GetEntry(n);
 
-		if(_sensor != sensor)continue;
-		if(_layer > 0 and _layer != layer)continue;
-		if(_ladder > 0 and _ladder != ladder)continue;
-
+		if(_sensor > -2 and _sensor != sensor)continue;
+		if(_layer > -1 and _layer != layer)continue;
+		if(_ladder > -1 and _ladder != ladder)continue;
 
 		for(i = 0; i < 4; ++i)
 		{
-			printf("\tx_%d:\t%10.6f\ty_%d:\t%10.6f\tz_%d:\t%10.6f\n", i, cross_pos[0][1], i, cross_pos[0][2], i, cross_pos[0][2]);
+			printf("\tx_%d:\t%10.6f\ty_%d:\t%10.6f\tz_%d:\t%10.6f\n", i, cross_pos[i][0], i, cross_pos[i][1], i, cross_pos[i][2]);
 			graph->AddPoint(cross_pos[i][2] + scale * cross_dis[i][2], cross_pos[i][0] + scale * cross_dis[i][0]);
 		}
 	}
@@ -108,38 +107,34 @@ void Draw(int const& _sensor, int const& _layer = -1, int const& _ladder = -1)
 	ymin = c - w / 2;
 	ymax = c + w / 2;
 
-	for(n = 0; n < mark_tree->GetEntriesFast(); ++n)
-	{
-		mark_tree->GetEntry(n);
-
-		if(_sensor != sensor)continue;
-		if(_layer > 0 and _layer != layer)continue;
-		if(_ladder > 0 and _ladder != ladder)continue;
-
-		graph->AddPoint(cross_pos[0][2] + scale * cross_dis[0][2], cross_pos[0][0] + scale * cross_dis[0][2]);
-		graph->AddPoint(cross_pos[1][2] + scale * cross_dis[1][2], cross_pos[1][0] + scale * cross_dis[1][2]);
-		graph->AddPoint(cross_pos[2][2] + scale * cross_dis[2][2], cross_pos[2][0] + scale * cross_dis[2][2]);
-		graph->AddPoint(cross_pos[3][2] + scale * cross_dis[3][2], cross_pos[3][0] + scale * cross_dis[3][2]);
-		break;
-	}
-
 	cnvs->cd();
-
 	TPad* ref_pad = new TPad("ref_pad", "ref_pad", 0.0, 0.0, 1.0, 1.0);
 	ref_pad->SetFillStyle(4000);
 	ref_pad->Range(xmin, ymin, xmax, ymax);
 	ref_pad->Draw();
 
-	std::array<TEllipse*, 4> ell;
-	for(i = 0; i < 4; ++i)
+	for(n = 0; n < mark_tree->GetEntriesFast(); ++n)
 	{
-		ref_pad->cd();
+		mark_tree->GetEntry(n);
 
-		ell[i] = new TEllipse(cross_pos[i][2], cross_pos[i][0], scale * radius, scale * radius);
-		ell[i]->SetLineColor(kRed);
-		ell[i]->SetLineWidth(3);
-		ell[i]->SetFillStyle(0);
-		ell[i]->Draw();
+		if(_sensor > -2 and _sensor != sensor)continue;
+		if(_layer > -1 and _layer != layer)continue;
+		if(_ladder > -1 and _ladder != ladder)continue;
+
+		for(i = 0; i < 4; ++i)
+		{
+			TArrow* a = new TArrow
+			(
+				cross_pos[i][2],
+				cross_pos[i][0],
+				cross_pos[i][2] + scale * cross_dis[i][2],
+				cross_pos[i][0] + scale * cross_dis[i][0],
+				arrow_size / scale,
+				"|>"
+			);
+			a->SetLineColor(kRed);
+			a->Draw();
+		}
 	}
 
 	cnvs->Update();
