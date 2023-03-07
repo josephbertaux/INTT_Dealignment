@@ -45,7 +45,7 @@ public:
 
 	int ReadSurveyFile(const std::string&);
 	int SetMarks(const int&);
-	int GetMark(const int&, const int&, TVector3&, TVector3&);
+	int GetMarkInLadder(const int&, const int&, TVector3&, TVector3&);
 	int GetWorstCross(double&);
 
 	int GetNominalPixelToSensor(const int&, const int&, const int &, AlignTransform&);

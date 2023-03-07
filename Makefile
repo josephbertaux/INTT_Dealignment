@@ -8,12 +8,12 @@ TRGS = main.exe
 SRC_DIR = ./src
 OBJ_DIR = ./bld
 
-CC = cc
+CC = cpp
 GG = g++
 
 FLAGS = `root-config --cflags`
 INCS = -I`root-config --incdir` #already included with root-config --cflags
-LIBS = `root-config --evelibs` -lTMVA -lTMVAGui -lRooFitCore -lRooFitMore -lRooFit
+LIBS = #`root-config --evelibs` -lTMVA -lTMVAGui -lRooFitCore -lRooFitMore -lRooFit
 
 SRCS = $(shell find $(SRC_DIR) -name *.$(CC))
 OBJS = $(patsubst $(SRC_DIR)/%.$(CC),$(OBJ_DIR)/%.o,$(SRCS))
@@ -28,7 +28,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(CC)
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -rf $(TRGS) $(OBJ_DIR)
 
 .PHONY: srcs
 srcs:

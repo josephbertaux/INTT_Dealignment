@@ -211,40 +211,40 @@ int InttSensorSurveyReader::SetMarks(const int& i)
 	return return_val;
 }
 
-int InttSensorSurveyReader::GetMark(const int& i, const int& j, TVector3& u, TVector3& v)
+int InttSensorSurveyReader::GetMarkInLadder(const int& i, const int& j, TVector3& u, TVector3& v)
 {
 	int return_val = 0;
 	std::stringstream out;
-	out << "InttSensorSurveyReader::GetMark(const int& i, const int& j, TVector3& u, TVector3& v)" << std::endl;
+	out << "InttSensorSurveyReader::GetMarkInLadder(const int& i, const int& j, TVector3& u, TVector3& v)" << std::endl;
+	//for sensor i cross j
+	//write the nominal position of that mark in the ladder's coordinate system to u
+	//write the actual position of that mark in the ladder's coordinate system to v
 
-	std::string s;
-	AlignTransform nominal_ladder_to_world;
-	AlignTransform mark_transform;
-	AlignTransform nominal_in_ladder;
-	AlignTransform actual_in_ladder;
+	std::string s = "";
+
+	AlignTransform nominal_mark;
+	AlignTransform actual_mark;
+	AlignTransform nominal_world_to_ladder;
+	AlignTransform actual_world_to_ladder;
 
 	std::map<std::string, std::tuple<TVector3, TVector3, bool>>::const_iterator mark = marks.begin();
 
-	if(!(0 <= i and i < crosses.size()))
+	if(!(0 <= j and j < crosses.size()))
 	{
-		out << "\tArgument \"i\" out of range" << std::endl;
+		out << "\tArgument \"j\" out of range" << std::endl;
 		return_val = 1;
 		goto label;
 	}
 
-	if(SetMarks(i))
-	{
-		return_val = 1;
-		goto label;
-	}
-
-	if(GetTransformFromMarks(nominal_ladder_to_world, nominal_endcaps))
+	if(i == -1 ? SetMarks(0) : SetMarks(i))
 	{
 		return_val = 1;
 		goto label;
 	}
 
-	s = sensors[i] + " - " + std::next(crosses.begin(), j)->first;
+	if(i == -1)s = std::next(endcaps.begin(), j)->first;
+	else s = sensors[i] + " - " + std::next(crosses.begin(), j)->first;
+
 	mark = marks.find(s);
 
 	if(mark == marks.end())
@@ -253,6 +253,7 @@ int InttSensorSurveyReader::GetMark(const int& i, const int& j, TVector3& u, TVe
 		return_val = 1;
 		goto label;
 	}
+
 	if(!std::get<2>(mark->second))
 	{
 			out << "\tMark \"" << s << "\" was not set" << std::endl;
@@ -261,37 +262,42 @@ int InttSensorSurveyReader::GetMark(const int& i, const int& j, TVector3& u, TVe
 			goto label;
 	}
 
-	mark_transform.Pos(0) = (std::get<0>(mark->second))[0];
-	mark_transform.Pos(1) = (std::get<0>(mark->second))[1];
-	mark_transform.Pos(2) = (std::get<0>(mark->second))[2];
+	//get the nominal position of the mark in world (OGP) coordinates
+	nominal_mark.Pos(0) = (std::get<0>(mark->second))[0];
+	nominal_mark.Pos(1) = (std::get<0>(mark->second))[1];
+	nominal_mark.Pos(2) = (std::get<0>(mark->second))[2];
 
-	nominal_ladder_to_world = nominal_ladder_to_world.Inverse();
-	mark_transform = nominal_ladder_to_world * mark_transform;
-	//mark transform is now its nominal tranform in the ladder frame
+	//get the actual position of the mark in world (OGP) coordinates
+	actual_mark.Pos(0) = (std::get<1>(mark->second))[0];
+	actual_mark.Pos(1) = (std::get<1>(mark->second))[1];
+	actual_mark.Pos(2) = (std::get<1>(mark->second))[2];
 
-	//using nominal position in ladder frame, find where this mark is and should be in sensor frame
-	if(GetNominalSensorToLadder(i, nominal_in_ladder))
+	//get the transform from the ladder's coordinate system to the world (OGP) coordinate system
+	if(GetTransformFromMarks(nominal_world_to_ladder, nominal_endcaps))
 	{
 		return_val = 1;
 		goto label;
 	}
-	if(GetActualSensorToLadder(i, actual_in_ladder))
+	nominal_world_to_ladder = nominal_world_to_ladder.Inverse();
+
+	if(GetTransformFromMarks(actual_world_to_ladder, actual_endcaps))
 	{
 		return_val = 1;
 		goto label;
 	}
+	actual_world_to_ladder = actual_world_to_ladder.Inverse();
+	//now it actually is world to ladder
 
-	nominal_in_ladder = nominal_in_ladder.Inverse();
-	nominal_in_ladder = nominal_in_ladder * mark_transform;
-	u[0] = nominal_in_ladder.Pos(0);
-	u[1] = nominal_in_ladder.Pos(1);
-	u[2] = nominal_in_ladder.Pos(2);
+	nominal_mark = nominal_world_to_ladder * nominal_mark;
+	actual_mark = actual_world_to_ladder * actual_mark;
 
-	actual_in_ladder = actual_in_ladder.Inverse();
-	actual_in_ladder = actual_in_ladder * mark_transform;
-	v[0] = actual_in_ladder.Pos(0);
-	v[1] = actual_in_ladder.Pos(1);
-	v[2] = actual_in_ladder.Pos(2);
+	u[0] = nominal_mark.Pos(0);
+	u[1] = nominal_mark.Pos(1);
+	u[2] = nominal_mark.Pos(2);
+
+	v[0] = actual_mark.Pos(0);
+	v[1] = actual_mark.Pos(1);
+	v[2] = actual_mark.Pos(2);
 
 	label:
 	out << std::ends;

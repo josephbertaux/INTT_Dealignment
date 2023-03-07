@@ -129,8 +129,8 @@ void Draw(int const& _layer = -1, int const& _ladder = -1, int const& _sensor = 
 				cross_pos[i][0],
 				cross_pos[i][2] + scale * cross_dis[i][2],
 				cross_pos[i][0] + scale * cross_dis[i][0],
-				arrow_size / scale,
-				"|>"
+				arrow_size / scale//,
+				//"|>"
 			);
 			a->SetLineColor(kRed);
 			a->Draw();

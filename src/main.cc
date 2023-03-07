@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include <iostream>
 
 #include "TH1D.h"
@@ -22,7 +23,7 @@ int main()
 	int sensor_bins = 20;
 	int pixel_bins = 120;
 	double bin_min = 0.0;
-	double bin_max = 0.6;
+	double bin_max = 0.2;
 
 	int layer = 0;
 	int ladder = 0;
@@ -31,12 +32,8 @@ int main()
 	int strip_z = 0;
 	int strip_x = 0;
 
-	double x;
-	double y;
-	double z;
-	double dx;
-	double dy;
-	double dz;
+	std::array<TVector3, 4> cross_pos;
+	std::array<TVector3, 4> cross_dis;
 
 	double c = 0.0;
 	double d = 0.0;
@@ -72,21 +69,25 @@ int main()
 	mark_tree->Branch("layer", &layer);
 	mark_tree->Branch("ladder", &ladder);
 	mark_tree->Branch("sensor", &sensor);
-	mark_tree->Branch("cross", &cross);
 
-	mark_tree->Branch("x", &x);
-	mark_tree->Branch("y", &y);
-	mark_tree->Branch("z", &z);
-	mark_tree->Branch("dx", &dx);
-	mark_tree->Branch("dy", &dy);
-	mark_tree->Branch("dz", &dz);
+	mark_tree->Branch("cross_pos0", &(cross_pos[0]));
+	mark_tree->Branch("cross_dis0", &(cross_dis[0]));
+
+	mark_tree->Branch("cross_pos1", &(cross_pos[1]));
+	mark_tree->Branch("cross_dis1", &(cross_dis[1]));
+
+	mark_tree->Branch("cross_pos2", &(cross_pos[2]));
+	mark_tree->Branch("cross_dis2", &(cross_dis[2]));
+
+	mark_tree->Branch("cross_pos3", &(cross_pos[3]));
+	mark_tree->Branch("cross_dis3", &(cross_dis[3]));
 
 	mark_tree->SetDirectory(file);
 
 	sensor_hist = new TH1D(sensor_hist_name.c_str(), "Distribution of Worst-Case Nominal-Actual Distances over INTT Sensors", sensor_bins, bin_min, bin_max);
 	pixel_hist = new TH1D(pixel_hist_name.c_str(), "Distribution of Strip Nominal-Actual Distances over INTT Sensors", pixel_bins, bin_min, bin_max);
-	sensor_hist->GetXaxis()->SetTitle("Strip distance from nominal (cm)");
-	pixel_hist->GetXaxis()->SetTitle("Strip distance from nominal (cm)");
+	sensor_hist->GetXaxis()->SetTitle("Strip distance from nominal (mm)");
+	pixel_hist->GetXaxis()->SetTitle("Strip distance from nominal (mm)");
 
 	for(layer = 0; layer < INTT::LAYER; ++layer)
 	{
@@ -98,55 +99,22 @@ int main()
 
 			if(sensor_reader.ReadSurveyFile(s))continue;
 
-			for(sensor = 0; sensor < INTT::SENSOR; ++sensor)
+			for(sensor = -1; sensor < INTT::SENSOR; ++sensor)
 			{
-				if(sensor_reader.SetMarks(sensor))continue;
+				if(sensor == -1 ? sensor_reader.SetMarks(0) : sensor_reader.SetMarks(sensor))continue;
 				std::cout << "Sensor: " << sensor << std::endl;
 				for(cross = 0; cross < 4; ++cross)
 				{
-					sensor_reader.GetMark(sensor, cross, a, b);
+					sensor_reader.GetMarkInLadder(sensor, cross, a, b);
 					std::cout << "\tCross: " << cross << std::endl;
-					printf("\t\tnominal:\tx:%+10.6f\ty:%+10.6f\tz:%+10.6f\t(cm)\n", a[0], a[1], a[2]);
-					printf("\t\tactual: \tx:%+10.6f\ty:%+10.6f\tz:%+10.6f\t(cm)\n", b[0], b[1], b[2]);
+					printf("\t\tnominal:\tx:%+10.6f\ty:%+10.6f\tz:%+10.6f\t(mm)\n", a[0], a[1], a[2]);
+					printf("\t\tactual: \tx:%+10.6f\ty:%+10.6f\tz:%+10.6f\t(mm)\n", b[0], b[1], b[2]);
 
-					x = a[0];
-					y = a[1];
-					z = a[2];
-
-					dx = b[0] - a[0];
-					dy = b[1] - a[1];
-					dz = b[2] - a[2];
-
-					mark_tree->Fill();
+					cross_pos[cross] = a;
+					cross_dis[cross] = b - a;
 				}
+				mark_tree->Fill();
 				std::cout << std::endl;
-				//d = 0.0;
-				//for(strip_x = 0; strip_x < INTT::STRIP_X; ++strip_x)
-				//{
-				//	for(strip_z = 0; strip_z < INTT::STRIP_Z[sensor]; ++strip_z)
-				//	{
-				//		if(sensor_reader.GetNominalPixelToLadder(sensor, strip_x, strip_z, t))continue;
-				//		if(sensor_reader.GetActualPixelToLadder(sensor, strip_x, strip_z, u))continue;
-
-				//		a[0] = t.Pos(0);
-				//		a[1] = 0.0;//t.Pos(1);
-				//		a[2] = t.Pos(2);
-
-				//		b[0] = u.Pos(0);
-				//		b[1] = 0.0;//u.Pos(1);
-				//		b[2] = u.Pos(2);
-
-				//		a = a - b;
-				//		c = a.Mag();
-
-				//		pixel_hist->Fill(c);
-				//		if(c > d)d = c;
-				//	}
-				//}
-				//std::cout << "\t\t" << sensor << ":\t" << d << "\t (cm)" << std::endl;
-				//sensor_hist->Fill(d);
-				//sensor_reader.GetWorstCross(d);
-				//std::cout << "\tworst cross:\t" << d << "\t (cm)" << std::endl;
 			}
 			std::cout << std::endl;
 		}
@@ -173,3 +141,34 @@ int main()
 
 	return 0;
 }
+
+/*
+				d = 0.0;
+				for(strip_x = 0; strip_x < INTT::STRIP_X; ++strip_x)
+				{
+					for(strip_z = 0; strip_z < INTT::STRIP_Z[sensor]; ++strip_z)
+					{
+						if(sensor_reader.GetNominalPixelToLadder(sensor, strip_x, strip_z, t))continue;
+						if(sensor_reader.GetActualPixelToLadder(sensor, strip_x, strip_z, u))continue;
+
+						a[0] = t.Pos(0);
+						a[1] = 0.0;//t.Pos(1);
+						a[2] = t.Pos(2);
+
+						b[0] = u.Pos(0);
+						b[1] = 0.0;//u.Pos(1);
+						b[2] = u.Pos(2);
+
+						a = a - b;
+						c = a.Mag();
+
+						pixel_hist->Fill(c);
+						if(c > d)d = c;
+					}
+				}
+			//	std::cout << "\t\t" << sensor << ":\t" << d << "\t (mm)" << std::endl;
+				sensor_hist->Fill(d);
+				if(d > 0.1)std::cout << "layer: " << layer << "ladder: " << ladder << std::endl;
+				sensor_reader.GetWorstCross(d);
+			//	std::cout << "\tworst cross:\t" << d << "\t (mm)" << std::endl;
+*/
