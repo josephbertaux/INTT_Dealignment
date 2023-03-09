@@ -112,8 +112,8 @@ LadderReader::LadderReader()
 	};
 
 	indexes[-1] = "Endcap";
-	indexes[0] = "Sensor A";
-	indexes[1] = "Sensor B";
+	indexes[1] = "Sensor A";
+	indexes[0] = "Sensor B";
 	indexes[2] = "Sensor C";
 	indexes[3] = "Sensor D";
 }
@@ -133,6 +133,21 @@ int LadderReader::SetMarksFromFile(std::string const& ladder_str)
 	CORNER_MAP::iterator jtr;
 	std::ifstream survey_file;
 
+	//run through the map and set the flag for each mark
+	//that it wasn't gotten successfully
+	//and restore the "actual" displacements to nominal
+	for(itr = marks.begin(); itr != marks.end(); ++itr)
+	{
+		std::get<2>(itr->second) = b;
+		for(jtr = std::get<1>(itr->second).begin(); jtr != std::get<1>(itr->second).end(); ++jtr)
+		{
+			for(i = 0; i < 3; ++i)
+			{
+				(jtr->second)[i] = (std::get<0>(itr->second)[jtr->first])[i];
+			}	
+		}
+	}
+
 	if(ladder_str.empty())
 	{
 		output_str << "\tArgument \"ladder_str\" is empty string" << std::endl;
@@ -147,13 +162,6 @@ int LadderReader::SetMarksFromFile(std::string const& ladder_str)
 		output_str << "\t" << path << ladder_str << std::endl;
 		return_val = 1;
 		goto label;
-	}
-
-	//run through the map and set the flag for each mark
-	//that it wasn't gotten successfully
-	for(itr = marks.begin(); itr != marks.end(); ++itr)
-	{
-		std::get<2>(itr->second) = b;
 	}
 
 	for(line; std::getline(survey_file, line);)
@@ -258,6 +266,7 @@ AlignTransform LadderReader::GetTransformToWorld(std::array<std::array<double, 3
 	//Center or offset should be average of the corners
 	for(i = 0; i < 3; ++i)
 	{
+		t[i] = 0.0;
 		for(j = 0; j < 4; ++j)
 		{
 			t[i] += c[j][i];
@@ -300,6 +309,28 @@ AlignTransform LadderReader::GetNominalTransformToWorld(int const& i)
 AlignTransform LadderReader::GetActualTransformToWorld(int const& i)
 {
 	return GetTransformToWorld(std::get<1>(marks[indexes[i]]));
+}
+
+AlignTransform LadderReader::GetNominalSensorToLadder(int const& i)
+{
+	AlignTransform a = GetNominalTransformToWorld(i);	//Sensor
+	AlignTransform b = GetNominalTransformToWorld(-1);	//Ladder
+
+	b = b.Inverse();
+	a = b * a;
+
+	return a;
+}
+
+AlignTransform LadderReader::GetActualSensorToLadder(int const& i)
+{
+	AlignTransform a = GetActualTransformToWorld(i);	//Sensor
+	AlignTransform b = GetActualTransformToWorld(-1);	//Ladder
+
+	b = b.Inverse();
+	a = b * a;
+
+	return a;
 }
 
 AlignTransform LadderReader::GetNominalMarkInWorld(int const& index, int const& corner)

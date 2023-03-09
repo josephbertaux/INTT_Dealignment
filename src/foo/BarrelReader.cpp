@@ -117,7 +117,7 @@ AlignTransform BarrelReader::GetNominalTransformToWorld(int const& i, int const&
 	AlignTransform a;
 	AlignTransform b;
 	double r = 0.0;
-	double t = 8.0 * atan(1.0); //2 pi
+	double t = 2.0 * atan(1.0);
 	double d = 8.0 * atan(1.0); //2 pi
 
 	switch(i)
@@ -125,7 +125,7 @@ AlignTransform BarrelReader::GetNominalTransformToWorld(int const& i, int const&
 		case 0:
 			r = 71.87489;
 			d /= 12.0;
-			t += d / 2.0;
+			t -= d / 2.0;
 			break;
 		case 1:
 			r = 77.99527;
@@ -134,7 +134,7 @@ AlignTransform BarrelReader::GetNominalTransformToWorld(int const& i, int const&
 		case 2:
 			r = 98.80091;
 			d /= 16.0;
-			t += d / 2.0;
+			t -= d / 2.0;
 			break;
 		case 3:
 			r = 103.28663;
@@ -142,7 +142,7 @@ AlignTransform BarrelReader::GetNominalTransformToWorld(int const& i, int const&
 			break;
 	}
 
-	t += j * d;
+	t -= j * d;
 
 	a.Pos(0) = r;
 	a.Ang("z") = -2.0 * atan(1.0); //right angle
@@ -152,6 +152,7 @@ AlignTransform BarrelReader::GetNominalTransformToWorld(int const& i, int const&
 	b.SetTransformFromAngles();
 
 	a = b * a;
+	a.SetAnglesFromTransform();
 
 	return a;
 }

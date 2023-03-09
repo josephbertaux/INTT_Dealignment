@@ -10,7 +10,9 @@
 
 class AngleConvention
 {
+	std::map<std::string, int> indexes;
 public:
+	AngleConvention();
 	virtual int SetTransformFromAngles(std::array<std::array<double, 4>, 4>&, std::array<double, 3> const&);
 	virtual int SetAnglesFromTransform(std::array<std::array<double, 4>, 4> const&, std::array<double, 3>&);
 	virtual int GetAngle(std::string const&);

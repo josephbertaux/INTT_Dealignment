@@ -1,5 +1,12 @@
 #include "TaitBryanZYX.h"
 
+TaitBryanZYX::TaitBryanZYX()
+{
+	indexes["z"] = 0;
+	indexes["y"] = 1;
+	indexes["x"] = 2;
+}
+
 int TaitBryanZYX::SetTransformFromAngles(std::array<std::array<double, 4>, 4>& t, std::array<double, 3> const& a)
 {
 	double s_0 = sin(a[0]);	double c_0 = cos(a[0]);
@@ -25,11 +32,10 @@ int TaitBryanZYX::SetAnglesFromTransform(std::array<std::array<double, 4>, 4> co
 
 int TaitBryanZYX::GetAngle(std::string const& s)
 {
-	if(strcmp(s.c_str(), "x") == 0)return 2;
-	if(strcmp(s.c_str(), "y") == 0)return 1;
-	if(strcmp(s.c_str(), "z") == 0)return 0;
+	if(indexes.find(s) == indexes.end())
+	{
+		return -1;
+	}
 
-	std::cout << s << std::endl;
-
-	return -1;
+	return indexes[s];
 }

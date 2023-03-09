@@ -106,17 +106,17 @@ AlignTransform AlignTransform::Inverse()
 	return rhs;
 }
 
-double& AlignTransform::Pos(const int& i)
+double& AlignTransform::Pos(int const& i)
 {
 	return axes[i][3];
 }
 
-double& AlignTransform::Ang(const int& i)
+double& AlignTransform::Ang(int const& i)
 {
 	return angs[i];
 }
 
-double& AlignTransform::Ang(const std::string& s)
+double& AlignTransform::Ang(std::string const& s)
 {
 	return angs[angle_convention->GetAngle(s)];
 }

@@ -25,14 +25,17 @@ public:
 
 	int SetMarksFromFile(std::string const&);
 
-	AlignTransform GetNominalTransformToWorld(int const&);
-	AlignTransform GetActualTransformToWorld(int const&);
+	AlignTransform GetNominalTransformToWorld(int const&);	//really just a helper, might make private
+	AlignTransform GetActualTransformToWorld(int const&);	//really just a helper, might make private
 
-	AlignTransform GetNominalMarkInWorld(int const&, int const&);
-	AlignTransform GetActualMarkInWorld(int const&, int const&);
+	AlignTransform GetNominalSensorToLadder(int const&);	//important
+	AlignTransform GetActualSensorToLadder(int const&);	//important
 
-	AlignTransform GetNominalMarkInLadder(int const&, int const&);
-	AlignTransform GetActualMarkInLadder(int const&, int const&);
+	AlignTransform GetNominalMarkInWorld(int const&, int const&);	//really just a helper, might make private
+	AlignTransform GetActualMarkInWorld(int const&, int const&);	//really just a helper, might make private
+
+	AlignTransform GetNominalMarkInLadder(int const&, int const&);	//important
+	AlignTransform GetActualMarkInLadder(int const&, int const&);	//important
 
 	void Print(std::string const& = "%10.6f");
 };

@@ -30,9 +30,9 @@ public:
 
 	AlignTransform Inverse();
 
-	double& Pos(const int&);
-	double& Ang(const int&);
-	double& Ang(const std::string&);
+	double& Pos(int const&);
+	double& Ang(int const&);
+	double& Ang(std::string const&);
 
 	int Check();
 	int Orthonormalize();
